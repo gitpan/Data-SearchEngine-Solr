@@ -1,5 +1,8 @@
 Revision history for Data-SearchEngine-Solr
 
+0.02    November 23rd, 2009
+  * Correct missing dependency on Data::SearchEngine (duh, Thanks Andreas Keonig)
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 
