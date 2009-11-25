@@ -8,7 +8,7 @@ use Time::HiRes qw(time);
 
 with 'Data::SearchEngine';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 has options => (
     is => 'ro',
@@ -50,6 +50,14 @@ sub search {
         foreach my $filter (keys %{ $query->filters }) {
             push(@{ $options->{fq} }, $query->get_filter($filter));
         }
+    }
+
+    if($query->has_order) {
+        $options->{sort} = $query->order;
+    }
+
+    if($query->page > 1) {
+        $options->{start} = ($query->page - 1) * $query->count;
     }
 
     my $start = time;
