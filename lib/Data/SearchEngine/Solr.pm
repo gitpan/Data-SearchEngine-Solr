@@ -3,13 +3,14 @@ use Moose;
 
 use Data::SearchEngine::Paginator;
 use Data::SearchEngine::Item;
+use Data::SearchEngine::Results::Spellcheck::Suggestion;
 use Data::SearchEngine::Solr::Results;
 use Time::HiRes qw(time);
 use WebService::Solr;
 
 with 'Data::SearchEngine';
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has options => (
     is => 'ro',
@@ -65,10 +66,12 @@ sub search {
     my $resp = $self->_solr->search($query->query, $options);
 
     my $dpager = $resp->pager;
+    # The response will have no pager if there were no results, so we handle
+    # that here.
     my $pager = Data::SearchEngine::Paginator->new(
-        current_page => $dpager->current_page,
-        entries_per_page => $dpager->entries_per_page,
-        total_entries => $dpager->total_entries
+        current_page => defined($dpager) ? $dpager->current_page : 0,
+        entries_per_page => defined($dpager) ? $dpager->entries_per_page : 0,
+        total_entries => defined($dpager) ? $dpager->total_entries : 0
     );
 
     my $result = Data::SearchEngine::Solr::Results->new(
@@ -86,6 +89,57 @@ sub search {
     if(exists($facets->{facet_queries})) {
         foreach my $facet (keys %{ $facets->{facet_queries} }) {
             $result->set_facet($facet, $facets->{facet_queries}->{$facet});
+        }
+    }
+
+    my $spellcheck = $resp->content->{spellcheck};
+
+    if(defined($spellcheck) && exists($spellcheck->{suggestions})) {
+        my $suggs = $spellcheck->{suggestions};
+        for(my $i = 0; $i < scalar(@{ $suggs }); $i += 2) {
+            my $sword = $suggs->[$i];
+            my $data = $suggs->[$i + 1];
+
+            if($sword eq 'collation') {
+                $result->spell_collation($data);
+                next;
+            }
+
+            # Necessary to skip some of the non-hash pieces, like
+            # correctlySpelled in the extended results
+            next unless ref($data) eq 'HASH';
+
+            if(exists($data->{origFreq})) {
+                # Only present in the extended results
+                $result->set_spell_frequency($sword, $data->{origFreq});
+            }
+
+            my $suggdata = $data->{suggestion};
+            if(defined($suggdata) && ref($suggdata) eq 'ARRAY') {
+                foreach my $sugg (@{ $suggdata }) {
+
+                    if(ref($sugg) eq 'HASH') {
+                        # This handles "extended results" from the spellcheck
+                        # component...
+                        $result->set_spell_suggestion($sugg->{word},
+                            Data::SearchEngine::Results::Spellcheck::Suggestion->new(
+                                original_word => $sword,
+                                word        => $sugg->{word},
+                                frequency   => $sugg->{freq}
+                            )
+                        );
+                    } else {
+                        # This handles non-"extended results" from the spellcheck
+                        # component...
+                        $result->set_spell_suggestion($sugg,
+                            Data::SearchEngine::Results::Spellcheck::Suggestion->new(
+                                original_word => $sword,
+                                word    => $sugg,
+                            )
+                        );
+                    }
+                }
+            }
         }
     }
 
