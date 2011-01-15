@@ -20,10 +20,10 @@ no_index:
     - inc
     - t
 requires:
-  Data::SearchEngine: 0.16
+  Data::SearchEngine: 0.17
   Moose: 0.92
   Time::HiRes: 0
   WebService::Solr: 0.11
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.15
+version: 0.16
