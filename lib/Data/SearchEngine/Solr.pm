@@ -1,6 +1,7 @@
 package Data::SearchEngine::Solr;
 use Moose;
 
+use Clone qw(clone);
 use Data::SearchEngine::Paginator;
 use Data::SearchEngine::Item;
 use Data::SearchEngine::Results::Spellcheck::Suggestion;
@@ -13,7 +14,7 @@ with (
     'Data::SearchEngine::Modifiable'
 );
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 has options => (
     is => 'ro',
@@ -92,10 +93,9 @@ sub remove_by_id {
 sub search {
     my ($self, $query) = @_;
 
-    my $options = $self->options;
+    my $options = clone($self->options);
 
     $options->{rows} = $query->count;
-    # page?
 
     if($query->has_filters) {
         $options->{fq} = [];
@@ -108,9 +108,11 @@ sub search {
         $options->{sort} = $query->order;
     }
 
-    if($query->page > 1) {
-        $options->{start} = ($query->page - 1) * $query->count;
+    if($query->has_debug) {
+        $options->{debug} = $query->debug;
     }
+
+    $options->{start} = ($query->page - 1) * $query->count;
 
     my $start = time;
     my $resp = $self->_solr->search($query->query, $options);
@@ -127,7 +129,8 @@ sub search {
     my $result = Data::SearchEngine::Solr::Results->new(
         query => $query,
         pager => $pager,
-        elapsed => time - $start
+        elapsed => time - $start,
+        raw => $resp
     );
 
     my $facets = $resp->facet_counts;
@@ -224,11 +227,17 @@ sub update {
 
 1;
 
-__END__
+
+
+=pod
 
 =head1 NAME
 
-Data::SearchEngine::Solr - Data::SearchEngine backend for Solr
+Data::SearchEngine::Solr
+
+=head1 VERSION
+
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -256,6 +265,10 @@ Data::SearchEngine::Solr - Data::SearchEngine backend for Solr
 
 Data::SearchEngine::Solr is a L<Data::SearchEngine> backend for the Solr
 search server.
+
+=head1 NAME
+
+Data::SearchEngine::Solr - Data::SearchEngine backend for Solr
 
 =head1 SOLR FEATURES
 
@@ -356,5 +369,19 @@ by the Free Software Foundation; or the Artistic License.
 
 See http://dev.perl.org/licenses/ for more information.
 
+=head1 AUTHOR
+
+Cory G Watson <gphat@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Cold Hard Code, LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
+
+
+__END__
+
