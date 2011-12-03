@@ -1,6 +1,6 @@
 package Data::SearchEngine::Solr::Results;
 {
-  $Data::SearchEngine::Solr::Results::VERSION = '0.19';
+  $Data::SearchEngine::Solr::Results::VERSION = '0.20';
 }
 use Moose;
 
@@ -21,7 +21,7 @@ Data::SearchEngine::Solr::Results
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 AUTHOR
 

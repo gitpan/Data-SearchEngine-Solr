@@ -90,6 +90,10 @@ sub remove_by_id {
 	return $self->_solr->delete_by_id($id);
 }
 
+sub find_by_id {
+    die "Not implemented!";
+}
+
 sub search {
     my ($self, $query) = @_;
 
@@ -237,7 +241,7 @@ Data::SearchEngine::Solr
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Data::SearchEngine::Solr",
   "PREREQ_PM" => {
     "Clone" => 0,
-    "Data::SearchEngine" => "0.27",
+    "Data::SearchEngine" => "0.28",
     "Data::SearchEngine::Item" => 0,
     "Data::SearchEngine::Paginator" => 0,
     "Data::SearchEngine::Results" => 0,
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Time::HiRes" => 0,
     "WebService::Solr" => "0.11"
   },
-  "VERSION" => "0.19",
+  "VERSION" => "0.20",
   "test" => {
     "TESTS" => "t/*.t"
   }

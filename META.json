@@ -4,7 +4,7 @@
       "Cory G Watson <gphat@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112150",
+   "generated_by" : "Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112150",
    "license" : [
       "perl_5"
    ],
@@ -22,7 +22,7 @@
       "runtime" : {
          "requires" : {
             "Clone" : 0,
-            "Data::SearchEngine" : "0.27",
+            "Data::SearchEngine" : "0.28",
             "Data::SearchEngine::Item" : 0,
             "Data::SearchEngine::Paginator" : 0,
             "Data::SearchEngine::Results" : 0,
@@ -51,6 +51,6 @@
          "web" : "https://github.com/gphat/data-searchengine-solr"
       }
    },
-   "version" : "0.19"
+   "version" : "0.20"
 }
 
